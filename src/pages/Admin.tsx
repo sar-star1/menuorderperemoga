@@ -23,12 +23,15 @@ type Order = {
   notes: string | null;
   total_uah: number;
   items: OrderItem[];
+  completed_at: string | null;
 };
 
 const Admin = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[] | null>(null);
+  const [showCompleted, setShowCompleted] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const load = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -46,6 +49,30 @@ const Admin = () => {
       return;
     }
     setOrders(data.orders as Order[]);
+  };
+
+  const toggleComplete = async (order: Order) => {
+    setUpdatingId(order.id);
+    const nextCompleted = !order.completed_at;
+    const { data, error } = await supabase.functions.invoke("update-order-status", {
+      body: { password, orderId: order.id, completed: nextCompleted },
+    });
+    setUpdatingId(null);
+    if (error || !data?.order) {
+      toast({
+        title: "Не вдалося оновити",
+        description: "Спробуйте ще раз.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setOrders((prev) =>
+      prev
+        ? prev.map((o) =>
+            o.id === order.id ? { ...o, completed_at: data.order.completed_at } : o,
+          )
+        : prev,
+    );
   };
 
   return (
