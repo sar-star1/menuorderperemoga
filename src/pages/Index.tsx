@@ -173,7 +173,7 @@ const Index = () => {
                 Peremoga Bakery
               </h1>
               <p className="font-body text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1.5">
-                Оптове замовлення · мін. {MIN_QTY} шт / позиція
+                {"\n"}
               </p>
             </div>
           </div>
