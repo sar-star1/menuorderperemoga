@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ShoppingBag } from "lucide-react";
-import peremogaLogo from "@/assets/peremoga-logo.jpg";
+import peremogaLogo from "@/assets/peremoga-logo.jpg.asset.json";
 
 const bakeryInfo = [
   { label: "Адреса", value: "вул. Григоровича-Барського, 1, Київ" },
@@ -30,7 +30,7 @@ const Navbar = () => {
         {/* Wordmark left */}
         <Link to="/" className="flex items-center" aria-label="Peremoga Bakery">
           <img
-            src={peremogaLogo}
+            src={peremogaLogo.url}
             alt="Peremoga Bakery"
             className="h-12 md:h-14 w-auto object-contain mix-blend-multiply rounded-full"
           />
