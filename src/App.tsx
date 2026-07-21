@@ -5,10 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import StandardLine from "./pages/StandardLine.tsx";
-import B2B from "./pages/B2B.tsx";
 import Admin from "./pages/Admin.tsx";
-import Clients from "./pages/Clients.tsx";
 import ScrollToTop from "./components/ScrollToTop.tsx";
 
 const queryClient = new QueryClient();
@@ -22,9 +19,6 @@ const App = () => (
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/standard-line" element={<StandardLine />} />
-          <Route path="/b2b" element={<B2B />} />
-          <Route path="/clients" element={<Clients />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
