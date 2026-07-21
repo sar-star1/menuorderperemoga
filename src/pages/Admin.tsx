@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import logo from "@/assets/peremoga-logo.png";
+import logo from "@/assets/peremoga-logo.jpg.asset.json";
 
 type OrderItem = {
   name: string;
@@ -52,7 +52,7 @@ const Admin = () => {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-30">
         <div className="container mx-auto px-6 py-4 flex items-center gap-3">
-          <img src={logo} alt="Peremoga Bakery" className="h-9 w-9 object-contain" />
+          <img src={logo.url} alt="Peremoga Bakery" className="h-9 w-9 object-contain" />
           <div>
             <h1 className="font-display-black uppercase text-lg leading-none">
               Peremoga Bakery
