@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import { menuCategories, type MenuItem } from "@/data/menuData";
@@ -428,6 +429,18 @@ const Index = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      <footer className="border-t border-border mt-16">
+        <div className="container mx-auto px-6 py-6 flex items-center justify-between text-xs text-muted-foreground">
+          <span>© Peremoga Bakery</span>
+          <Link
+            to="/admin"
+            className="font-body uppercase tracking-[0.25em] text-[10px] hover:text-foreground transition-colors"
+          >
+            Адмін доступ
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 };
