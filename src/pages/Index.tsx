@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import logo from "@/assets/peremoga-logo.png";
 
 const MIN_QTY = 10;
 
@@ -161,13 +162,20 @@ const Index = () => {
       {/* Header */}
       <header className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto px-6 py-5 flex items-center justify-between gap-4">
-          <div>
-            <h1 className="font-display-black uppercase text-lg sm:text-xl tracking-tight leading-none">
-              Peremoga Bakery
-            </h1>
-            <p className="font-body text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1.5">
-              Оптове замовлення · мін. {MIN_QTY} шт / позиція
-            </p>
+          <div className="flex items-center gap-3 min-w-0">
+            <img
+              src={logo}
+              alt="Peremoga Bakery"
+              className="h-10 w-10 sm:h-12 sm:w-12 object-contain flex-shrink-0"
+            />
+            <div className="min-w-0">
+              <h1 className="font-display-black uppercase text-lg sm:text-xl tracking-tight leading-none">
+                Peremoga Bakery
+              </h1>
+              <p className="font-body text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1.5">
+                Оптове замовлення · мін. {MIN_QTY} шт / позиція
+              </p>
+            </div>
           </div>
           <Button
             type="button"
