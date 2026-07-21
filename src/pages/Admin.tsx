@@ -23,12 +23,15 @@ type Order = {
   notes: string | null;
   total_uah: number;
   items: OrderItem[];
+  completed_at: string | null;
 };
 
 const Admin = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[] | null>(null);
+  const [showCompleted, setShowCompleted] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const load = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -46,6 +49,30 @@ const Admin = () => {
       return;
     }
     setOrders(data.orders as Order[]);
+  };
+
+  const toggleComplete = async (order: Order) => {
+    setUpdatingId(order.id);
+    const nextCompleted = !order.completed_at;
+    const { data, error } = await supabase.functions.invoke("update-order-status", {
+      body: { password, orderId: order.id, completed: nextCompleted },
+    });
+    setUpdatingId(null);
+    if (error || !data?.order) {
+      toast({
+        title: "Не вдалося оновити",
+        description: "Спробуйте ще раз.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setOrders((prev) =>
+      prev
+        ? prev.map((o) =>
+            o.id === order.id ? { ...o, completed_at: data.order.completed_at } : o,
+          )
+        : prev,
+    );
   };
 
   return (
@@ -81,76 +108,122 @@ const Admin = () => {
             </Button>
           </form>
         ) : (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="font-body text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                {orders.length} замовлень
-              </p>
-              <Button variant="outline" size="sm" onClick={() => load()} disabled={loading}>
-                {loading ? "…" : "Оновити"}
-              </Button>
-            </div>
-            {orders.length === 0 && (
-              <p className="text-sm text-muted-foreground">Поки що немає замовлень.</p>
-            )}
-            <ul className="space-y-4">
-              {orders.map((o) => (
-                <li key={o.id} className="border border-border p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div>
-                      <p className="font-display-black uppercase text-sm">
-                        {o.customer_name}
-                      </p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        {new Date(o.created_at).toLocaleString("uk-UA")}
-                      </p>
-                    </div>
-                    <span className="font-mono text-sm">{o.total_uah} ₴</span>
+          (() => {
+            const pending = orders.filter((o) => !o.completed_at);
+            const completed = orders.filter((o) => o.completed_at);
+            const visible = showCompleted ? completed : pending;
+            return (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex gap-2">
+                    <Button
+                      variant={showCompleted ? "outline" : "default"}
+                      size="sm"
+                      onClick={() => setShowCompleted(false)}
+                    >
+                      Активні · {pending.length}
+                    </Button>
+                    <Button
+                      variant={showCompleted ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setShowCompleted(true)}
+                    >
+                      Виконані · {completed.length}
+                    </Button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="text-muted-foreground">Тел: </span>
-                      <a href={`tel:${o.phone}`} className="underline">
-                        {o.phone}
-                      </a>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Email: </span>
-                      <a href={`mailto:${o.email}`} className="underline">
-                        {o.email}
-                      </a>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <span className="text-muted-foreground">Адреса: </span>
-                      {o.address}
-                    </div>
-                    {o.notes && (
-                      <div className="sm:col-span-2">
-                        <span className="text-muted-foreground">Коментар: </span>
-                        {o.notes}
+                  <Button variant="outline" size="sm" onClick={() => load()} disabled={loading}>
+                    {loading ? "…" : "Оновити"}
+                  </Button>
+                </div>
+                {visible.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    {showCompleted ? "Немає виконаних замовлень." : "Немає активних замовлень."}
+                  </p>
+                )}
+                <ul className="space-y-4">
+                  {visible.map((o) => (
+                    <li
+                      key={o.id}
+                      className={`border border-border p-4 space-y-3 ${
+                        o.completed_at ? "opacity-60" : ""
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div>
+                          <p className="font-display-black uppercase text-sm">
+                            {o.customer_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground font-mono">
+                            {new Date(o.created_at).toLocaleString("uk-UA")}
+                          </p>
+                          {o.completed_at && (
+                            <p className="text-[10px] uppercase tracking-[0.2em] text-green-700 mt-1">
+                              ✓ Виконано {new Date(o.completed_at).toLocaleString("uk-UA")}
+                            </p>
+                          )}
+                        </div>
+                        <span className="font-mono text-sm">{o.total_uah} ₴</span>
                       </div>
-                    )}
-                  </div>
-                  <ul className="border-t border-border pt-2 space-y-1 text-xs">
-                    {(o.items ?? []).map((it, i) => (
-                      <li
-                        key={i}
-                        className="flex items-center justify-between font-mono gap-3"
-                      >
-                        <span className="truncate">{it.name}</span>
-                        <span className="text-muted-foreground whitespace-nowrap">
-                          {it.qty} × {it.unit_price_uah} ₴
-                        </span>
-                        <span className="w-16 text-right whitespace-nowrap">
-                          {it.subtotal_uah} ₴
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-muted-foreground">Тел: </span>
+                          <a href={`tel:${o.phone}`} className="underline">
+                            {o.phone}
+                          </a>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Email: </span>
+                          <a href={`mailto:${o.email}`} className="underline">
+                            {o.email}
+                          </a>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <span className="text-muted-foreground">Адреса: </span>
+                          {o.address}
+                        </div>
+                        {o.notes && (
+                          <div className="sm:col-span-2">
+                            <span className="text-muted-foreground">Коментар: </span>
+                            {o.notes}
+                          </div>
+                        )}
+                      </div>
+                      <ul className="border-t border-border pt-2 space-y-1 text-xs">
+                        {(o.items ?? []).map((it, i) => (
+                          <li
+                            key={i}
+                            className="flex items-center justify-between font-mono gap-3"
+                          >
+                            <span className="truncate">{it.name}</span>
+                            <span className="text-muted-foreground whitespace-nowrap">
+                              {it.qty} × {it.unit_price_uah} ₴
+                            </span>
+                            <span className="w-16 text-right whitespace-nowrap">
+                              {it.subtotal_uah} ₴
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="pt-2 border-t border-border flex justify-end">
+                        <Button
+                          size="sm"
+                          variant={o.completed_at ? "outline" : "default"}
+                          onClick={() => toggleComplete(o)}
+                          disabled={updatingId === o.id}
+                        >
+                          {updatingId === o.id
+                            ? "…"
+                            : o.completed_at
+                            ? "Позначити як активне"
+                            : "Позначити виконаним"}
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })()
         )}
       </main>
     </div>
