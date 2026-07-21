@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Editorial gallery palette — off-white + near-black */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+
+    --primary: 0 0% 4%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 4%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 210 40% 90%;
+    --accent-foreground: 0 0% 4%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 4%;
+
+    --radius: 0rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 4%;
+    --sidebar-primary: 0 0% 4%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 4%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 0 0% 4%;
+
+    /* Pastel accent blocks (Dominique Ansel style decorative offsets) */
+    --pastel-blue: 205 55% 90%;
+    --pastel-lime: 66 60% 78%;
+    --pastel-lavender: 260 35% 90%;
+    --pastel-peach: 22 78% 88%;
+
+    /* Deeper blue accent (Базова Лінійка) */
+    --accent-blue: 205 60% 32%;
+    --accent-blue-soft: 205 55% 95%;
+
+    /* Legacy token aliases — remapped to monochrome so existing components still work */
+    --warm-gold: 0 0% 4%;
+    --warm-cream: 0 0% 98%;
+    --wheat: 0 0% 4%;
+    --steel-blue: 205 55% 90%;
+    --charcoal: 0 0% 4%;
+    --ivory: 0 0% 100%;
+    --linen: 0 0% 98%;
+  }
+
+  .dark {
+    --background: 0 0% 6%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 6%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 96%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 0 0% 96%;
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 0 0% 96%;
+    --sidebar-primary-foreground: 0 0% 6%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 0 0% 96%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    @apply text-foreground;
+  }
+
+  .bg-hero-overlay {
+    background: linear-gradient(180deg,
+      hsla(0, 0%, 100%, 0) 0%,
+      hsla(0, 0%, 100%, 0) 60%,
+      hsla(0, 0%, 100%, 0.6) 100%);
+  }
+
+  .bg-warm-gradient {
+    @apply bg-background;
+  }
+
+  .bg-linen-gradient {
+    background-color: hsl(0 0% 98%);
+  }
+
+  .font-display-black {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  .wheat-divider {
+    position: relative;
+  }
+
+  .wheat-divider::after {
+    content: "";
+    display: block;
+    height: 1px;
+    width: 64px;
+    margin: 1.5rem auto 0;
+    background: hsl(var(--foreground));
+  }
+}
+
+/* Product image background (reversible — set BLEND_IMAGES to false in MenuSection.tsx to disable) */
+.product-image-blend {
+  background: hsl(var(--background)) !important;
+}
+
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
