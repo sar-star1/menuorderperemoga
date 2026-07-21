@@ -192,17 +192,7 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Intro */}
-      <section className="container mx-auto px-6 pt-10 pb-6 max-w-3xl">
-        <h2 className="font-display-black uppercase text-2xl sm:text-3xl leading-tight">
-          Меню для B2B замовлень
-        </h2>
-        <p className="text-sm text-muted-foreground font-light mt-3 leading-relaxed">
-          Оптові замовлення для кавʼярень, ресторанів та корпоративних клієнтів.
-          Мінімальна кількість — {MIN_QTY} штук за позицією. Оплата та узгодження
-          доставки після підтвердження менеджером.
-        </p>
-      </section>
+      <div className="pt-6" />
 
       {/* Menu */}
       <main className="container mx-auto px-6 space-y-14">
