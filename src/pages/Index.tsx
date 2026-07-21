@@ -164,7 +164,7 @@ const Index = () => {
         <div className="container mx-auto px-6 py-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <img
-              src={logo}
+              src={logo.url}
               alt="Peremoga Bakery"
               className="h-10 w-10 sm:h-12 sm:w-12 object-contain flex-shrink-0"
             />
