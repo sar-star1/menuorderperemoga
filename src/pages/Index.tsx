@@ -124,8 +124,11 @@ const Index = () => {
     }
     setErrors({});
     setSubmitting(true);
-    const payload = {
-      ...parsed.data,
+    const { error } = await supabase.from("orders").insert({
+      customer_name: parsed.data.customer_name,
+      phone: parsed.data.phone,
+      email: parsed.data.email,
+      address: parsed.data.address,
       notes: parsed.data.notes ?? null,
       items: cartLines.map((l) => ({
         name: l.name,
@@ -134,8 +137,7 @@ const Index = () => {
         subtotal_uah: l.subtotal,
       })),
       total_uah: totalUah,
-    };
-    const { error } = await supabase.from("orders").insert(payload);
+    });
     setSubmitting(false);
     if (error) {
       toast({
