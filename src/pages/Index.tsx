@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/peremoga-logo.jpg.asset.json";
 
-const MIN_QTY = 10;
+
 
 const parsePrice = (price: string): number => {
   const digits = price.replace(/[^\d]/g, "");
@@ -79,12 +79,11 @@ const Index = () => {
 
   const inc = (name: string) => {
     const cur = cart[name] ?? 0;
-    setQty(name, cur === 0 ? MIN_QTY : cur + 1);
+    setQty(name, cur + 1);
   };
   const dec = (name: string) => {
     const cur = cart[name] ?? 0;
-    if (cur <= MIN_QTY) setQty(name, 0);
-    else setQty(name, cur - 1);
+    setQty(name, cur - 1);
   };
 
   const cartLines = useMemo(
