@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
-import { Minus, Plus, ShoppingCart, X } from "lucide-react";
-import { menuCategories, type MenuItem } from "@/data/menuData";
+import { Minus, Plus, ShoppingCart, X, Snowflake, Info } from "lucide-react";
+import { menuCategories, deliveryTerms, type MenuItem } from "@/data/menuData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -18,15 +18,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/peremoga-logo.jpg.asset.json";
 
-
-
 const parsePrice = (price: string): number => {
   const digits = price.replace(/[^\d]/g, "");
   return digits ? parseInt(digits, 10) : 0;
 };
 
-type ProductKey = string;
-type CartMap = Record<ProductKey, number>;
+type CartMap = Record<string, number>;
+
+const keyOf = (category: string, item: MenuItem) => `${category}::${item.name}`;
+const minOf = (categoryMin: number, item: MenuItem) => item.minOrder ?? categoryMin;
 
 const checkoutSchema = z.object({
   customer_name: z.string().trim().min(1, "Вкажіть імʼя").max(120),
@@ -44,6 +44,7 @@ const checkoutSchema = z.object({
 const Index = () => {
   const [cart, setCart] = useState<CartMap>({});
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     customer_name: "",
@@ -54,55 +55,63 @@ const Index = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const allItems = useMemo(() => {
-    const list: { category: string; item: MenuItem }[] = [];
+  const itemByKey = useMemo(() => {
+    const map = new Map<string, { item: MenuItem; category: string; min: number }>();
     for (const cat of menuCategories) {
-      for (const item of cat.items) list.push({ category: cat.name, item });
+      for (const item of cat.items) {
+        map.set(keyOf(cat.name, item), {
+          item,
+          category: cat.name,
+          min: minOf(cat.minOrder, item),
+        });
+      }
     }
-    return list;
+    return map;
   }, []);
 
-  const itemByName = useMemo(() => {
-    const map = new Map<string, MenuItem>();
-    for (const { item } of allItems) map.set(item.name, item);
-    return map;
-  }, [allItems]);
-
-  const setQty = (name: string, qty: number) => {
+  const setQty = (key: string, qty: number) => {
     setCart((prev) => {
       const next = { ...prev };
-      if (qty <= 0) delete next[name];
-      else next[name] = qty;
+      if (qty <= 0) delete next[key];
+      else next[key] = qty;
       return next;
     });
   };
 
-  const inc = (name: string) => {
-    const cur = cart[name] ?? 0;
-    setQty(name, cur + 1);
+  const inc = (key: string, min: number) => {
+    const cur = cart[key] ?? 0;
+    setQty(key, cur === 0 ? min : cur + 1);
   };
-  const dec = (name: string) => {
-    const cur = cart[name] ?? 0;
-    setQty(name, cur - 1);
+  const dec = (key: string, min: number) => {
+    const cur = cart[key] ?? 0;
+    setQty(key, cur <= min ? 0 : cur - 1);
   };
 
   const cartLines = useMemo(
     () =>
       Object.entries(cart)
-        .map(([name, qty]) => {
-          const item = itemByName.get(name);
-          if (!item) return null;
-          const unit = parsePrice(item.price);
-          return { name, qty, unit, subtotal: unit * qty, item };
+        .map(([key, qty]) => {
+          const entry = itemByKey.get(key);
+          if (!entry) return null;
+          const unit = parsePrice(entry.item.price);
+          return {
+            key,
+            name: entry.item.name,
+            category: entry.category,
+            qty,
+            unit,
+            subtotal: unit * qty,
+          };
         })
         .filter(Boolean) as {
+        key: string;
         name: string;
+        category: string;
         qty: number;
         unit: number;
         subtotal: number;
-        item: MenuItem;
       }[],
-    [cart, itemByName],
+    [cart, itemByKey],
   );
 
   const totalUah = cartLines.reduce((s, l) => s + l.subtotal, 0);
@@ -132,7 +141,7 @@ const Index = () => {
       address: parsed.data.address,
       notes: parsed.data.notes ?? null,
       items: cartLines.map((l) => ({
-        name: l.name,
+        name: `${l.category} — ${l.name}`,
         qty: l.qty,
         unit_price_uah: l.unit,
         subtotal_uah: l.subtotal,
@@ -161,107 +170,141 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground pb-32">
       {/* Header */}
       <header className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto px-6 py-5 flex items-center justify-between gap-4">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <img
               src={logo.url}
               alt="Peremoga Bakery"
               className="h-10 w-10 sm:h-12 sm:w-12 object-contain flex-shrink-0"
             />
-            <div className="min-w-0">
-              <h1 className="font-display-black uppercase text-lg sm:text-xl tracking-tight leading-none">
-                Peremoga Bakery
-              </h1>
-              <p className="font-body text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1.5">
-                {"\n"}
-              </p>
-            </div>
+            <h1 className="font-display-black uppercase text-base sm:text-xl tracking-tight leading-none truncate">
+              Peremoga Bakery
+            </h1>
           </div>
-          <Button
-            type="button"
-            onClick={() => setCheckoutOpen(true)}
-            disabled={cartLines.length === 0}
-            className="gap-2"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="hidden sm:inline">Оформити</span>
-            <span className="font-mono text-xs">
-              {totalUnits > 0 ? `${totalUnits} · ${totalUah} ₴` : "0"}
-            </span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setTermsOpen(true)}
+              className="gap-2"
+            >
+              <Info className="h-4 w-4" />
+              <span className="font-body uppercase tracking-[0.2em] text-[11px]">Умови</span>
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setCheckoutOpen(true)}
+              disabled={cartLines.length === 0}
+              className="gap-2"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span className="font-mono text-xs">
+                {totalUnits > 0 ? `${totalUnits} · ${totalUah} ₴` : "0"}
+              </span>
+            </Button>
+          </div>
         </div>
       </header>
 
-      <div className="pt-6" />
-
       {/* Menu */}
-      <main className="container mx-auto px-6 space-y-14">
+      <main className="container mx-auto px-6 pt-10 space-y-16">
         {menuCategories.map((cat) => (
           <section key={cat.name}>
-            <div className="flex items-baseline justify-between border-b border-border pb-3 mb-6">
-              <h3 className="font-display-black uppercase text-sm tracking-[0.2em]">
+            <div className="border-b border-foreground pb-3 mb-8">
+              <h2 className="font-display-black uppercase text-2xl sm:text-3xl tracking-tight leading-none">
                 {cat.name}
-              </h3>
-              <span className="font-body text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                {cat.items.length} позицій
-              </span>
+              </h2>
+              <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
+                {cat.note ?? `Мінімальне замовлення від ${cat.minOrder} шт.`}
+              </p>
             </div>
-            <ul className="divide-y divide-border">
+
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
               {cat.items.map((item) => {
-                const qty = cart[item.name] ?? 0;
+                const key = keyOf(cat.name, item);
+                const min = minOf(cat.minOrder, item);
+                const qty = cart[key] ?? 0;
                 const unit = parsePrice(item.price);
                 return (
-                  <li
-                    key={item.name}
-                    className="py-4 flex items-center gap-4 sm:gap-6"
-                  >
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-secondary/40 flex items-center justify-center overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        loading="lazy"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <h4 className="font-display-black uppercase text-sm leading-tight">
-                          {item.name}
-                        </h4>
-                        <span className="font-mono text-sm whitespace-nowrap">
-                          {item.price}
+                  <li key={key} className="flex flex-col">
+                    <div className="relative aspect-[4/3] bg-secondary/40 overflow-hidden flex items-center justify-center">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="font-display-black uppercase text-xs text-muted-foreground">
+                          Peremoga
                         </span>
-                      </div>
-                      <p className="text-[11px] text-muted-foreground mt-1 font-body uppercase tracking-[0.2em]">
-                        {item.weight}
-                      </p>
-                      {qty > 0 && (
-                        <p className="text-[11px] text-muted-foreground mt-1 font-mono">
-                          {qty} × {unit} ₴ = {qty * unit} ₴
-                        </p>
                       )}
+                      <div className="absolute top-2 left-2 flex flex-col items-start gap-1">
+                        {item.badge && (
+                          <span
+                            className={`font-body uppercase tracking-[0.2em] text-[9px] px-2 py-1 ${
+                              item.badge === "NEW"
+                                ? "bg-destructive text-destructive-foreground"
+                                : "bg-primary text-primary-foreground"
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                        {item.freezable && (
+                          <span className="flex items-center gap-1 bg-background/90 text-foreground font-body uppercase tracking-[0.2em] text-[9px] px-2 py-1">
+                            <Snowflake className="h-3 w-3" />
+                            Можна заморожувати
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => dec(item.name)}
-                        disabled={qty === 0}
-                        aria-label="Зменшити"
-                        className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <Minus className="h-3.5 w-3.5" />
-                      </button>
-                      <span className="font-mono text-sm w-10 text-center tabular-nums">
-                        {qty}
+
+                    <div className="mt-3 flex items-start justify-between gap-3">
+                      <h3 className="font-display-black uppercase text-sm leading-tight">
+                        {item.name}
+                      </h3>
+                      <span className="font-mono text-sm whitespace-nowrap">{item.price}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed font-light">
+                      {item.description}
+                    </p>
+                    <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
+                      {item.weight} · мін. {min} шт.
+                    </p>
+                    {item.storage && (
+                      <p className="font-body text-[10px] text-muted-foreground/80 mt-1">
+                        {item.storage}
+                      </p>
+                    )}
+
+                    <div className="mt-auto pt-4 flex items-center justify-between gap-3">
+                      <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+                        {qty > 0 ? `${qty} × ${unit} ₴ = ${qty * unit} ₴` : ""}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => inc(item.name)}
-                        aria-label="Збільшити"
-                        className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => dec(key, min)}
+                          disabled={qty === 0}
+                          aria-label={`Зменшити ${item.name}`}
+                          className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <Minus className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="font-mono text-sm w-8 text-center tabular-nums">
+                          {qty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => inc(key, min)}
+                          aria-label={`Збільшити ${item.name}`}
+                          className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </li>
                 );
@@ -271,7 +314,7 @@ const Index = () => {
         ))}
       </main>
 
-      {/* Sticky cart bar (mobile-friendly) */}
+      {/* Sticky cart bar */}
       {cartLines.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background/95 backdrop-blur">
           <div className="container mx-auto px-6 py-3 flex items-center justify-between gap-4">
@@ -290,6 +333,36 @@ const Index = () => {
         </div>
       )}
 
+      {/* Terms dialog */}
+      <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display-black uppercase text-xl">
+              {deliveryTerms.title}
+            </DialogTitle>
+            <DialogDescription className="font-body text-xs text-muted-foreground">
+              Умови співпраці та доставки для партнерів Peremoga Bakery.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-5">
+            {deliveryTerms.blocks.map((block) => (
+              <div key={block.heading}>
+                <h3 className="font-display-black uppercase text-xs tracking-[0.25em] border-b border-border pb-2">
+                  {block.heading}
+                </h3>
+                <ul className="mt-3 space-y-1.5">
+                  {block.lines.map((line) => (
+                    <li key={line} className="text-xs text-muted-foreground leading-relaxed">
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Checkout dialog */}
       <Dialog open={checkoutOpen} onOpenChange={setCheckoutOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -302,7 +375,6 @@ const Index = () => {
             </DialogDescription>
           </DialogHeader>
 
-          {/* Cart summary */}
           <div className="border border-border p-3 space-y-2">
             <p className="font-body text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
               Ваше замовлення
@@ -312,19 +384,19 @@ const Index = () => {
             ) : (
               <ul className="space-y-1.5">
                 {cartLines.map((l) => (
-                  <li
-                    key={l.name}
-                    className="flex items-center justify-between gap-3 text-xs"
-                  >
+                  <li key={l.key} className="flex items-center justify-between gap-3 text-xs">
                     <button
                       type="button"
-                      onClick={() => setQty(l.name, 0)}
+                      onClick={() => setQty(l.key, 0)}
                       className="text-muted-foreground hover:text-foreground"
                       aria-label={`Видалити ${l.name}`}
                     >
                       <X className="h-3 w-3" />
                     </button>
-                    <span className="flex-1 truncate">{l.name}</span>
+                    <span className="flex-1 truncate">
+                      {l.name}
+                      <span className="text-muted-foreground"> · {l.category}</span>
+                    </span>
                     <span className="font-mono text-muted-foreground whitespace-nowrap">
                       {l.qty} × {l.unit} ₴
                     </span>
@@ -336,9 +408,7 @@ const Index = () => {
               </ul>
             )}
             <div className="flex items-center justify-between border-t border-border pt-2 font-mono text-sm">
-              <span className="font-display-black uppercase tracking-[0.2em] text-xs">
-                Разом
-              </span>
+              <span className="font-display-black uppercase tracking-[0.2em] text-xs">Разом</span>
               <span>{totalUah} ₴</span>
             </div>
           </div>
@@ -349,16 +419,12 @@ const Index = () => {
               <Input
                 id="customer_name"
                 value={form.customer_name}
-                onChange={(e) =>
-                  setForm({ ...form, customer_name: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
                 maxLength={120}
                 required
               />
               {errors.customer_name && (
-                <p className="text-xs text-destructive mt-1">
-                  {errors.customer_name}
-                </p>
+                <p className="text-xs text-destructive mt-1">{errors.customer_name}</p>
               )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -372,9 +438,7 @@ const Index = () => {
                   maxLength={40}
                   required
                 />
-                {errors.phone && (
-                  <p className="text-xs text-destructive mt-1">{errors.phone}</p>
-                )}
+                {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}
               </div>
               <div>
                 <Label htmlFor="email">Email *</Label>
@@ -386,9 +450,7 @@ const Index = () => {
                   maxLength={255}
                   required
                 />
-                {errors.email && (
-                  <p className="text-xs text-destructive mt-1">{errors.email}</p>
-                )}
+                {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
               </div>
             </div>
             <div>
@@ -400,9 +462,7 @@ const Index = () => {
                 maxLength={500}
                 required
               />
-              {errors.address && (
-                <p className="text-xs text-destructive mt-1">{errors.address}</p>
-              )}
+              {errors.address && <p className="text-xs text-destructive mt-1">{errors.address}</p>}
             </div>
             <div>
               <Label htmlFor="notes">Коментар (необовʼязково)</Label>
@@ -422,8 +482,8 @@ const Index = () => {
               {submitting ? "Відправляємо…" : `Підтвердити замовлення · ${totalUah} ₴`}
             </Button>
             <p className="text-[10px] text-muted-foreground text-center">
-              Натискаючи кнопку, ви погоджуєтесь, що менеджер звʼяжеться з вами для
-              підтвердження. Оплата не стягується онлайн.
+              Натискаючи кнопку, ви погоджуєтесь, що менеджер звʼяжеться з вами для підтвердження.
+              Оплата не стягується онлайн.
             </p>
           </form>
         </DialogContent>
