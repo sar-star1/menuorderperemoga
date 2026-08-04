@@ -1,3 +1,29 @@
+import eclairChocolateImg from "@/assets/menu/eclair-chocolate.jpg.asset.json";
+import eclairPistachioImg from "@/assets/menu/eclair-pistachio.jpg.asset.json";
+import eclairSaltedCaramelImg from "@/assets/menu/eclair-salted-caramel.jpg.asset.json";
+import eclairVanillaImg from "@/assets/menu/eclair-vanilla.jpg.asset.json";
+import miniTartRaspberryImg from "@/assets/menu/mini-tart-raspberry.jpg.asset.json";
+import potatoCherryImg from "@/assets/menu/potato-cherry.jpg.asset.json";
+import pavlovaBerryImg from "@/assets/menu/pavlova-berry.jpg.asset.json";
+import pavlovaBlueberryLemonImg from "@/assets/menu/pavlova-blueberry-lemon.jpg.asset.json";
+import pavlovaMangoPassionImg from "@/assets/menu/pavlova-mango-passion.jpg.asset.json";
+import trifleBerryPistachioImg from "@/assets/menu/trifle-berry-pistachio.jpg.asset.json";
+import donutStrawberryImg from "@/assets/menu/donut-strawberry.jpg.asset.json";
+import donutForestBerriesImg from "@/assets/menu/donut-forest-berries.jpg.asset.json";
+import donutDarkChocolateImg from "@/assets/menu/donut-dark-chocolate.jpg.asset.json";
+import donutSaltedCaramelImg from "@/assets/menu/donut-salted-caramel.jpg.asset.json";
+import donutPannaCottaImg from "@/assets/menu/donut-panna-cotta.jpg.asset.json";
+import donutCherryImg from "@/assets/menu/donut-cherry.jpg.asset.json";
+import donutHazelnutImg from "@/assets/menu/donut-hazelnut.jpg.asset.json";
+import macaronChampagneCurrantImg from "@/assets/menu/macaron-champagne-currant.jpg.asset.json";
+import macaronBaileysCaramelImg from "@/assets/menu/macaron-baileys-caramel.jpg.asset.json";
+import macaronDorbluPearImg from "@/assets/menu/macaron-dorblu-pear.jpg.asset.json";
+import macaronMojitoRaspberryImg from "@/assets/menu/macaron-mojito-raspberry.jpg.asset.json";
+import macaronPistachioBlueberryImg from "@/assets/menu/macaron-pistachio-blueberry.jpg.asset.json";
+import macaronVanillaStrawberryImg from "@/assets/menu/macaron-vanilla-strawberry.jpg.asset.json";
+import breadDarnytskyiImg from "@/assets/menu/bread-darnytskyi.jpg.asset.json";
+import breadYeastFreeImg from "@/assets/menu/bread-yeast-free.jpg.asset.json";
+
 export interface MenuItem {
   name: string;
   price: string;
@@ -321,7 +347,7 @@ export const menuCategories: MenuCategory[] = [
           "Заварне тісто. Начинка: крем-муслін на основі білого шоколаду, сезонні ягоди. Прикрашений кольоровою глазурʼю та подрібненою фісташкою.",
         weight: "70 г",
         freezable: true,
-        image: B + "LmPIa-IxBAs-wmEDG.png",
+        image: eclairPistachioImg.url,
       },
       {
         name: "Шоколадний",
@@ -330,7 +356,7 @@ export const menuCategories: MenuCategory[] = [
           "Заварне тісто. Начинка: крем-муслін на основі білого шоколаду з додаванням чорного шоколаду. Прикрашений кольоровою глазурʼю і ніжним шоколадним кремом.",
         weight: "80 г",
         freezable: true,
-        image: B + "IuSHQ-RIHHq-sCHnH.png",
+        image: eclairChocolateImg.url,
       },
       {
         name: "Солона карамель",
@@ -339,7 +365,7 @@ export const menuCategories: MenuCategory[] = [
           "Заварне тісто. Начинка: крем-муслін на основі білого шоколаду, солона карамель. Прикрашений кольоровою глазурʼю, горіховою крихтою і солодким попкорном.",
         weight: "70 г",
         freezable: true,
-        image: B + "GlBeO-zVZkW-YClRs.png",
+        image: eclairSaltedCaramelImg.url,
       },
       {
         name: "Малина-мʼята",
@@ -357,7 +383,7 @@ export const menuCategories: MenuCategory[] = [
           "Заварне тісто. Начинка: крем-муслін на основі білого шоколаду з ваніллю. Прикрашений кольоровою глазурʼю і ніжним кремом.",
         weight: "75 г",
         freezable: true,
-        image: B + "AaGmB-UAikM-kBeaq.png",
+        image: eclairVanillaImg.url,
       },
       {
         name: "З полуницею",
@@ -498,7 +524,7 @@ export const menuCategories: MenuCategory[] = [
           "Пісочний хрумкий міні-тарт зі свіжою малиною та ванільним кремом на основі білого шоколаду.",
         weight: "60 г",
         badge: "ОНОВЛЕННЯ ДЕКОРУ",
-        image: B + "FzQgq-FKkzT-CQppL.jpeg",
+        image: miniTartRaspberryImg.url,
       },
       {
         name: "Міні-тарт лимонний",
@@ -628,7 +654,7 @@ export const menuCategories: MenuCategory[] = [
           "Шоколадний бісквіт з коньяком. У начинці солодка вишня. Глазур на основі білого шоколаду.",
         weight: "85 г",
         freezable: true,
-        image: B + "CFHeA-lPHal-IxgCo.png",
+        image: potatoCherryImg.url,
       },
       {
         name: "«Картопля» фісташка-малина",
@@ -671,7 +697,7 @@ export const menuCategories: MenuCategory[] = [
         weight: "85 г",
         minOrder: 4,
         storage: "Термін зберігання: 3 дні",
-        image: B + "UwedH-wbkCy-gppxi.jpeg",
+        image: pavlovaBerryImg.url,
       },
       {
         name: "Десерт Павлова «Чорниця-лимон»",
@@ -680,7 +706,7 @@ export const menuCategories: MenuCategory[] = [
         weight: "90 г",
         minOrder: 4,
         storage: "Термін зберігання: 3 дні",
-        image: B + "UwedH-wbkCy-gppxi.jpeg",
+        image: pavlovaBlueberryLemonImg.url,
       },
       {
         name: "Десерт Павлова «Манго-маракуя»",
@@ -689,7 +715,7 @@ export const menuCategories: MenuCategory[] = [
         weight: "85 г",
         minOrder: 4,
         storage: "Термін зберігання: 3 дні",
-        image: B + "UwedH-wbkCy-gppxi.jpeg",
+        image: pavlovaMangoPassionImg.url,
       },
       {
         name: "Трайфл ягоди-фісташка",
@@ -700,7 +726,7 @@ export const menuCategories: MenuCategory[] = [
         minOrder: 5,
         badge: "ОНОВЛЕННЯ ДЕКОРУ",
         storage: "Термін зберігання: 4 дні",
-        image: B + "lDJXH-NXLYv-sQykT.jpeg",
+        image: trifleBerryPistachioImg.url,
       },
       {
         name: "Трайфл тірамісу",
@@ -763,7 +789,7 @@ export const menuCategories: MenuCategory[] = [
         description: "Бісквітне ніжне та пухке тісто з полуничною начинкою.",
         weight: "70 г",
         freezable: true,
-        image: B + "xprik-Gulhr-QDNge.jpeg",
+        image: donutStrawberryImg.url,
       },
       {
         name: "Лісові ягоди",
@@ -772,7 +798,7 @@ export const menuCategories: MenuCategory[] = [
           "Бісквітне ніжне та пухке тісто з подвійною начинкою з лісових ягід і сирного крему.",
         weight: "70 г",
         freezable: true,
-        image: B + "xprik-Gulhr-QDNge.jpeg",
+        image: donutForestBerriesImg.url,
       },
       {
         name: "Чорний шоколад",
@@ -780,7 +806,7 @@ export const menuCategories: MenuCategory[] = [
         description: "Бісквітне ніжне та пухке тісто з шоколадною начинкою.",
         weight: "70 г",
         freezable: true,
-        image: B + "xprik-Gulhr-QDNge.jpeg",
+        image: donutDarkChocolateImg.url,
       },
       {
         name: "Солона карамель",
@@ -789,7 +815,7 @@ export const menuCategories: MenuCategory[] = [
           "Бісквітне ніжне та пухке тісто з начинкою з солоної карамелі власного виробництва.",
         weight: "70 г",
         freezable: true,
-        image: B + "xprik-Gulhr-QDNge.jpeg",
+        image: donutSaltedCaramelImg.url,
       },
       {
         name: "Панна котта",
@@ -798,7 +824,7 @@ export const menuCategories: MenuCategory[] = [
           "Бісквітне ніжне та пухке тісто з подвійною начинкою з малини та сирного крему, прикрашений сублімованою полуницею.",
         weight: "70 г",
         freezable: true,
-        image: B + "xprik-Gulhr-QDNge.jpeg",
+        image: donutPannaCottaImg.url,
       },
       {
         name: "Вишневий",
@@ -807,7 +833,7 @@ export const menuCategories: MenuCategory[] = [
           "Бісквітне ніжне та пухке тісто двох різних кольорів — завдяки натуральному барвнику карміну, зі свіжою вишневою начинкою.",
         weight: "70 г",
         freezable: true,
-        image: B + "xprik-Gulhr-QDNge.jpeg",
+        image: donutCherryImg.url,
       },
       {
         name: "Лісовий горіх",
@@ -817,7 +843,7 @@ export const menuCategories: MenuCategory[] = [
         weight: "70 г",
         badge: "NEW",
         freezable: true,
-        image: B + "xprik-Gulhr-QDNge.jpeg",
+        image: donutHazelnutImg.url,
       },
     ],
   },
@@ -832,7 +858,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Білий шоколад lubeka 33%, вершки smietanka 36%, ром, масло 82%, пюре смородини.",
         weight: "40-45 г",
-        image: B + "uKqWj-coqJQ-koIFY.jpeg",
+        image: macaronChampagneCurrantImg.url,
       },
       {
         name: "Бейліз — солона карамель",
@@ -840,35 +866,35 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Білий шоколад 33%, вершки 36%, кава, віскі, вершкове масло 82%. Серединка: солона карамель.",
         weight: "40-45 г",
-        image: B + "uKqWj-coqJQ-koIFY.jpeg",
+        image: macaronBaileysCaramelImg.url,
       },
       {
         name: "Дорблю — груша",
         price: "60 ₴",
         description: "Білий шоколад, вершки, сир дорблю. Серединка: кюлі з груші.",
         weight: "40-45 г",
-        image: B + "uKqWj-coqJQ-koIFY.jpeg",
+        image: macaronDorbluPearImg.url,
       },
       {
         name: "Мохіто — малина",
         price: "60 ₴",
         description: "Білий шоколад, вершки, мʼята, сік лайму, ром. Серединка: кюлі з малини.",
         weight: "40-45 г",
-        image: B + "uKqWj-coqJQ-koIFY.jpeg",
+        image: macaronMojitoRaspberryImg.url,
       },
       {
         name: "Фісташка — чорниця",
         price: "60 ₴",
         description: "Білий шоколад, вершки, фісташкова паста. Серединка: кюлі з малини.",
         weight: "40-45 г",
-        image: B + "uKqWj-coqJQ-koIFY.jpeg",
+        image: macaronPistachioBlueberryImg.url,
       },
       {
         name: "Ваніль — полуниця",
         price: "60 ₴",
         description: "Білий шоколад, вершки, натуральна ваніль. Серединка: кюлі з полуниці.",
         weight: "40-45 г",
-        image: B + "uKqWj-coqJQ-koIFY.jpeg",
+        image: macaronVanillaStrawberryImg.url,
       },
     ],
   },
@@ -907,7 +933,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Приготовлений на житньо-солодовій заквасці з додаванням журавлини, соняшникового насіння та меду.",
         weight: "0,470 кг",
-        image: B + "JJkJv-bDIDC-hBHCC.png",
+        image: breadDarnytskyiImg.url,
       },
       {
         name: "Гречаний бездріжджовий",
@@ -939,7 +965,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Бездріжджовий хліб з житніми висівками та льоном, зроблений на житній заквасці.",
         weight: "0,450 кг",
-        image: B + "iTPjT-GfGtQ-GHhCj.png",
+        image: breadYeastFreeImg.url,
       },
     ],
   },
