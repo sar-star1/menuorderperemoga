@@ -534,9 +534,18 @@ const Index = () => {
                 rows={3}
               />
             </div>
+            {blockingIssues.length > 0 && (
+              <ul className="border border-destructive/40 p-3 space-y-1">
+                {blockingIssues.map((msg) => (
+                  <li key={msg} className="text-[11px] text-destructive">
+                    {msg}
+                  </li>
+                ))}
+              </ul>
+            )}
             <Button
               type="submit"
-              disabled={submitting || cartLines.length === 0}
+              disabled={submitting || !canCheckout}
               className="w-full"
             >
               {submitting ? "Відправляємо…" : `Підтвердити замовлення · ${totalUah} ₴`}
