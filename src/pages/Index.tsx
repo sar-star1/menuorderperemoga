@@ -78,14 +78,8 @@ const Index = () => {
     });
   };
 
-  const inc = (key: string, min: number) => {
-    const cur = cart[key] ?? 0;
-    setQty(key, cur === 0 ? min : cur + 1);
-  };
-  const dec = (key: string, min: number) => {
-    const cur = cart[key] ?? 0;
-    setQty(key, cur <= min ? 0 : cur - 1);
-  };
+  const inc = (key: string) => setQty(key, (cart[key] ?? 0) + 1);
+  const dec = (key: string) => setQty(key, (cart[key] ?? 0) - 1);
 
   const cartLines = useMemo(
     () =>
