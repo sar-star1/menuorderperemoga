@@ -242,21 +242,32 @@ const Index = () => {
 
       {/* Menu */}
       <main className="container mx-auto px-6 pt-10 space-y-16">
-        {menuCategories.map((cat) => (
+        {menuCategories.map((cat) => {
+          const status = groupStatus.get(cat.name)!;
+          return (
           <section key={cat.name}>
             <div className="border-b border-foreground pb-3 mb-8">
               <h2 className="font-display-black uppercase text-2xl sm:text-3xl tracking-tight leading-none">
                 {cat.name}
               </h2>
               <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
-                {cat.note ?? `Мінімальне замовлення від ${cat.minOrder} шт.`}
+                {cat.note ?? `Мінімум ${cat.minOrder} шт. сумарно у групі`}
               </p>
+              {status.qty > 0 && (
+                <p
+                  className={`font-mono text-[11px] mt-1 ${
+                    status.ok ? "text-muted-foreground" : "text-destructive"
+                  }`}
+                >
+                  У групі: {status.qty} шт.
+                  {status.ok ? "" : ` — потрібно ще ${status.min - status.qty} шт.`}
+                </p>
+              )}
             </div>
 
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
               {cat.items.map((item) => {
                 const key = keyOf(cat.name, item);
-                const min = minOf(cat.minOrder, item);
                 const qty = cart[key] ?? 0;
                 const unit = parsePrice(item.price);
                 return (
