@@ -111,6 +111,46 @@ const Index = () => {
   const totalUah = cartLines.reduce((s, l) => s + l.subtotal, 0);
   const totalUnits = cartLines.reduce((s, l) => s + l.qty, 0);
 
+  // Minimums are per group: the sum of all items in a category (excluding items
+  // that carry their own individual minimum) must reach the category minimum.
+  const groupStatus = useMemo(() => {
+    const map = new Map<string, { qty: number; min: number; ok: boolean }>();
+    for (const cat of menuCategories) {
+      let qty = 0;
+      for (const item of cat.items) {
+        if (item.minOrder) continue;
+        qty += cart[keyOf(cat.name, item)] ?? 0;
+      }
+      map.set(cat.name, { qty, min: cat.minOrder, ok: qty === 0 || qty >= cat.minOrder });
+    }
+    return map;
+  }, [cart]);
+
+  const itemMinIssues = useMemo(
+    () =>
+      cartLines
+        .map((l) => {
+          const entry = itemByKey.get(l.key);
+          const own = entry?.item.minOrder;
+          if (!own || l.qty >= own) return null;
+          return `${l.name} — мінімум ${own} шт.`;
+        })
+        .filter(Boolean) as string[],
+    [cartLines, itemByKey],
+  );
+
+  const groupIssues = useMemo(
+    () =>
+      [...groupStatus.entries()]
+        .filter(([, s]) => !s.ok)
+        .map(([name, s]) => `${name} — мінімум ${s.min} шт. у групі (зараз ${s.qty})`),
+    [groupStatus],
+  );
+
+  const blockingIssues = [...groupIssues, ...itemMinIssues];
+  const canCheckout = cartLines.length > 0 && blockingIssues.length === 0;
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cartLines.length === 0) {
