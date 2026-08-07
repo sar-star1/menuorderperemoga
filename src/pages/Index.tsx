@@ -305,7 +305,8 @@ const Index = () => {
                       {item.description}
                     </p>
                     <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
-                      {item.weight} · мін. {min} шт.
+                      {item.weight}
+                      {item.minOrder ? ` · мін. ${item.minOrder} шт.` : ""}
                     </p>
                     {item.storage && (
                       <p className="font-body text-[10px] text-muted-foreground/80 mt-1">
