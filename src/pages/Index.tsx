@@ -157,6 +157,14 @@ const Index = () => {
       toast({ title: "Кошик порожній", description: "Додайте позиції в замовлення." });
       return;
     }
+    if (blockingIssues.length > 0) {
+      toast({
+        title: "Не дотримано мінімального замовлення",
+        description: blockingIssues.join("; "),
+        variant: "destructive",
+      });
+      return;
+    }
     const parsed = checkoutSchema.safeParse(form);
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
