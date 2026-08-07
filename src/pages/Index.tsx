@@ -357,7 +357,8 @@ const Index = () => {
               })}
             </ul>
           </section>
-        ))}
+          );
+        })}
       </main>
 
       {/* Sticky cart bar */}
@@ -371,8 +372,13 @@ const Index = () => {
               <p className="font-mono text-sm truncate">
                 {totalUnits} шт · {totalUah} ₴
               </p>
+              {blockingIssues.length > 0 && (
+                <p className="font-mono text-[11px] text-destructive truncate">
+                  {blockingIssues[0]}
+                </p>
+              )}
             </div>
-            <Button type="button" onClick={() => setCheckoutOpen(true)}>
+            <Button type="button" onClick={() => setCheckoutOpen(true)} disabled={!canCheckout}>
               Оформити замовлення
             </Button>
           </div>
