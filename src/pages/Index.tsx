@@ -320,7 +320,7 @@ const Index = () => {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => dec(key, min)}
+                          onClick={() => dec(key)}
                           disabled={qty === 0}
                           aria-label={`Зменшити ${item.name}`}
                           className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
@@ -332,7 +332,7 @@ const Index = () => {
                         </span>
                         <button
                           type="button"
-                          onClick={() => inc(key, min)}
+                          onClick={() => inc(key)}
                           aria-label={`Збільшити ${item.name}`}
                           className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary transition-colors"
                         >
