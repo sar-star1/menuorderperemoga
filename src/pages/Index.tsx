@@ -370,7 +370,7 @@ const Index = () => {
                 <SheetTitle className="font-display-black uppercase text-lg">Категорії</SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col">
-                {promoItems.length > 0 && (
+                {promoSection.active && (
                   <button
                     type="button"
                     onClick={() => scrollToCategory("cat-akcii")}
@@ -393,7 +393,7 @@ const Index = () => {
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2">
-            {promoItems.length > 0 && (
+            {promoSection.active && (
               <button
                 type="button"
                 onClick={() => scrollToCategory("cat-akcii")}
@@ -429,7 +429,7 @@ const Index = () => {
         </div>
       </header>
 
-      {promoItems.length > 0 && (
+      {promoSection.active && (
         <button
           type="button"
           onClick={() => scrollToCategory("cat-akcii")}
@@ -444,7 +444,7 @@ const Index = () => {
 
       {/* Menu */}
       <main className="container mx-auto px-6 pt-10 space-y-16">
-        {promoItems.length > 0 && (
+        {promoSection.active && (
           <section id="cat-akcii" className="scroll-mt-24">
             <div className="border-b border-foreground pb-3 mb-8">
               <h2 className="font-display-black uppercase text-2xl sm:text-3xl tracking-tight leading-none flex items-center gap-2">
@@ -455,9 +455,15 @@ const Index = () => {
                 {promoSection.subtitle}
               </p>
             </div>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 sm:gap-y-10">
-              {promoItems.map(({ category, item }) => renderItem(category, item))}
-            </ul>
+            {promoItems.length > 0 ? (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 sm:gap-y-10">
+                {promoItems.map(({ category, item }) => renderItem(category, item))}
+              </ul>
+            ) : (
+              <p className="font-body text-sm text-muted-foreground">
+                Зараз акційних позицій немає. Слідкуйте за оновленнями — тут зʼявиться «Товар тижня».
+              </p>
+            )}
           </section>
         )}
         {menuCategories.map((cat) => {
