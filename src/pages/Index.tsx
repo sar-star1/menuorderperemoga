@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
-import { Minus, Plus, ShoppingCart, X, Snowflake, Info } from "lucide-react";
+import { Minus, Plus, ShoppingCart, X, Snowflake, Info, Tag } from "lucide-react";
 import { menuCategories, deliveryTerms, type MenuItem } from "@/data/menuData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -12,11 +12,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/peremoga-logo.jpg.asset.json";
+
+const slugify = (name: string) =>
+  "cat-" +
+  name
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-|-$/g, "");
 
 const parsePrice = (price: string): number => {
   const digits = price.replace(/[^\d]/g, "");
