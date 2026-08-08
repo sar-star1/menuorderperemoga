@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { Minus, Plus, ShoppingCart, X, Snowflake, Info, Tag } from "lucide-react";
-import { menuCategories, deliveryTerms, type MenuItem } from "@/data/menuData";
+import { menuCategories, deliveryTerms, promoSection, type MenuItem } from "@/data/menuData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -64,9 +64,11 @@ const Index = () => {
 
   const promoItems = useMemo(
     () =>
-      menuCategories.flatMap((cat) =>
-        cat.items.filter((i) => i.promo).map((item) => ({ category: cat.name, item })),
-      ),
+      promoSection.active
+        ? menuCategories.flatMap((cat) =>
+            cat.items.filter((i) => i.promo).map((item) => ({ category: cat.name, item })),
+          )
+        : [],
     [],
   );
 
@@ -374,7 +376,7 @@ const Index = () => {
                     onClick={() => scrollToCategory("cat-akcii")}
                     className="text-left border-b border-border py-3 font-display-black uppercase text-sm hover:text-primary transition-colors"
                   >
-                    Акції
+                    Акції · {promoSection.title}
                   </button>
                 )}
                 {menuCategories.map((cat) => (
@@ -391,6 +393,18 @@ const Index = () => {
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2">
+            {promoItems.length > 0 && (
+              <button
+                type="button"
+                onClick={() => scrollToCategory("cat-akcii")}
+                className="hidden sm:flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-primary-foreground shadow-sm ring-2 ring-primary/30 hover:opacity-90 transition-opacity animate-pulse"
+              >
+                <Tag className="h-4 w-4" />
+                <span className="font-body uppercase tracking-[0.2em] text-[11px]">
+                  {promoSection.title}
+                </span>
+              </button>
+            )}
             <Button
               type="button"
               variant="outline"
@@ -415,6 +429,19 @@ const Index = () => {
         </div>
       </header>
 
+      {promoItems.length > 0 && (
+        <button
+          type="button"
+          onClick={() => scrollToCategory("cat-akcii")}
+          className="sm:hidden w-full bg-primary text-primary-foreground py-2.5 flex items-center justify-center gap-2"
+        >
+          <Tag className="h-4 w-4" />
+          <span className="font-body uppercase tracking-[0.25em] text-[10px]">
+            {promoSection.title} · Акції
+          </span>
+        </button>
+      )}
+
       {/* Menu */}
       <main className="container mx-auto px-6 pt-10 space-y-16">
         {promoItems.length > 0 && (
@@ -422,10 +449,10 @@ const Index = () => {
             <div className="border-b border-foreground pb-3 mb-8">
               <h2 className="font-display-black uppercase text-2xl sm:text-3xl tracking-tight leading-none flex items-center gap-2">
                 <Tag className="h-5 w-5" />
-                Акції
+                Акції · {promoSection.title}
               </h2>
               <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
-                Спеціальні пропозиції · мінімуми груп зберігаються
+                {promoSection.subtitle}
               </p>
             </div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 sm:gap-y-10">
