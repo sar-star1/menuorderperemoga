@@ -51,6 +51,17 @@ export interface MenuCategory {
   items: MenuItem[];
 }
 
+/**
+ * Рубрика «Акції» / «Товар тижня».
+ * active: false — кнопка і секція повністю ховаються.
+ * Позиції потрапляють сюди автоматично, якщо мають поле `promo`.
+ */
+export const promoSection = {
+  active: true,
+  title: "Товар тижня",
+  subtitle: "Знижки на обрані позиції — обмежений час",
+};
+
 const B = "https://cdn-media.choiceqr.com/prod-eat-peremoga-bakery950/menu/thumbnail_";
 
 export const deliveryTerms = {
