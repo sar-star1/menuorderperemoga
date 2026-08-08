@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
-import { Minus, Plus, ShoppingCart, X, Snowflake, Info } from "lucide-react";
+import { Minus, Plus, ShoppingCart, X, Snowflake, Info, Tag } from "lucide-react";
 import { menuCategories, deliveryTerms, type MenuItem } from "@/data/menuData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -12,11 +12,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/peremoga-logo.jpg.asset.json";
+
+const slugify = (name: string) =>
+  "cat-" +
+  name
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-|-$/g, "");
 
 const parsePrice = (price: string): number => {
   const digits = price.replace(/[^\d]/g, "");
@@ -45,7 +59,24 @@ const Index = () => {
   const [cart, setCart] = useState<CartMap>({});
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const promoItems = useMemo(
+    () =>
+      menuCategories.flatMap((cat) =>
+        cat.items.filter((i) => i.promo).map((item) => ({ category: cat.name, item })),
+      ),
+    [],
+  );
+
+  const scrollToCategory = (id: string) => {
+    setNavOpen(false);
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
   const [form, setForm] = useState({
     customer_name: "",
     phone: "",
@@ -208,21 +239,157 @@ const Index = () => {
     setCheckoutOpen(false);
   };
 
+  const renderItem = (categoryName: string, item: MenuItem) => {
+    const key = keyOf(categoryName, item);
+    const qty = cart[key] ?? 0;
+    const unit = parsePrice(item.price);
+    return (
+      <li
+        key={key}
+        className="flex flex-row sm:flex-col gap-3 sm:gap-0 border-b border-border pb-4 sm:border-0 sm:pb-0"
+      >
+        <div className="relative order-2 sm:order-none w-24 h-24 sm:w-full sm:h-auto sm:aspect-[4/3] flex-shrink-0 bg-secondary/40 overflow-hidden flex items-center justify-center">
+          {item.image ? (
+            <img
+              src={item.image}
+              alt={item.name}
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="font-display-black uppercase text-[9px] sm:text-xs text-muted-foreground">
+              Peremoga
+            </span>
+          )}
+          <div className="absolute top-1 left-1 sm:top-2 sm:left-2 flex flex-col items-start gap-1">
+            {item.promo && (
+              <span className="bg-destructive text-destructive-foreground font-body uppercase tracking-[0.2em] text-[8px] sm:text-[9px] px-1.5 py-0.5 sm:px-2 sm:py-1">
+                {item.promo}
+              </span>
+            )}
+            {item.badge && (
+              <span
+                className={`font-body uppercase tracking-[0.2em] text-[8px] sm:text-[9px] px-1.5 py-0.5 sm:px-2 sm:py-1 ${
+                  item.badge === "NEW"
+                    ? "bg-destructive text-destructive-foreground"
+                    : "bg-primary text-primary-foreground"
+                }`}
+              >
+                {item.badge}
+              </span>
+            )}
+            {item.freezable && (
+              <span className="hidden sm:flex items-center gap-1 bg-background/90 text-foreground font-body uppercase tracking-[0.2em] text-[9px] px-2 py-1">
+                <Snowflake className="h-3 w-3" />
+                Можна заморожувати
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="order-1 sm:order-none flex-1 min-w-0 flex flex-col">
+          <div className="sm:mt-3 flex items-start justify-between gap-3">
+            <h3 className="font-display-black uppercase text-sm leading-tight">{item.name}</h3>
+            <span className="font-mono text-sm whitespace-nowrap">{item.price}</span>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1 sm:mt-2 leading-relaxed font-light line-clamp-2 sm:line-clamp-none">
+            {item.description}
+          </p>
+          <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-1 sm:mt-2">
+            {item.weight}
+            {item.minOrder ? ` · мін. ${item.minOrder} шт.` : ""}
+            {item.freezable ? " · можна заморожувати" : ""}
+          </p>
+          {item.storage && (
+            <p className="hidden sm:block font-body text-[10px] text-muted-foreground/80 mt-1">
+              {item.storage}
+            </p>
+          )}
+
+          <div className="mt-auto pt-2 sm:pt-4 flex items-center justify-between gap-3">
+            <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+              {qty > 0 ? `${qty} × ${unit} ₴ = ${qty * unit} ₴` : ""}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => dec(key)}
+                disabled={qty === 0}
+                aria-label={`Зменшити ${item.name}`}
+                className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+              <span className="font-mono text-sm w-8 text-center tabular-nums">{qty}</span>
+              <button
+                type="button"
+                onClick={() => inc(key)}
+                aria-label={`Збільшити ${item.name}`}
+                className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </li>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-32">
       {/* Header */}
       <header className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <img
-              src={logo.url}
-              alt="Peremoga Bakery"
-              className="h-10 w-10 sm:h-12 sm:w-12 object-contain flex-shrink-0"
-            />
-            <h1 className="font-display-black uppercase text-base sm:text-xl tracking-tight leading-none truncate">
-              Peremoga Bakery
-            </h1>
-          </div>
+          <Sheet open={navOpen} onOpenChange={setNavOpen}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                aria-label="Категорії меню"
+                className="flex items-center gap-3 min-w-0 text-left hover:opacity-80 transition-opacity"
+              >
+                <img
+                  src={logo.url}
+                  alt="Peremoga Bakery"
+                  className="h-10 w-10 sm:h-12 sm:w-12 object-contain flex-shrink-0"
+                />
+                <span className="min-w-0">
+                  <h1 className="font-display-black uppercase text-base sm:text-xl tracking-tight leading-none truncate">
+                    Peremoga Bakery
+                  </h1>
+                  <span className="block font-body uppercase tracking-[0.25em] text-[9px] text-muted-foreground mt-1">
+                    Категорії
+                  </span>
+                </span>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[85vw] max-w-sm overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle className="font-display-black uppercase text-lg">Категорії</SheetTitle>
+              </SheetHeader>
+              <nav className="mt-6 flex flex-col">
+                {promoItems.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => scrollToCategory("cat-akcii")}
+                    className="text-left border-b border-border py-3 font-display-black uppercase text-sm hover:text-primary transition-colors"
+                  >
+                    Акції
+                  </button>
+                )}
+                {menuCategories.map((cat) => (
+                  <button
+                    key={cat.name}
+                    type="button"
+                    onClick={() => scrollToCategory(slugify(cat.name))}
+                    className="text-left border-b border-border py-3 font-display-black uppercase text-sm hover:text-primary transition-colors"
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
           <div className="flex items-center gap-2">
             <Button
               type="button"
@@ -250,10 +417,26 @@ const Index = () => {
 
       {/* Menu */}
       <main className="container mx-auto px-6 pt-10 space-y-16">
+        {promoItems.length > 0 && (
+          <section id="cat-akcii" className="scroll-mt-24">
+            <div className="border-b border-foreground pb-3 mb-8">
+              <h2 className="font-display-black uppercase text-2xl sm:text-3xl tracking-tight leading-none flex items-center gap-2">
+                <Tag className="h-5 w-5" />
+                Акції
+              </h2>
+              <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
+                Спеціальні пропозиції · мінімуми груп зберігаються
+              </p>
+            </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 sm:gap-y-10">
+              {promoItems.map(({ category, item }) => renderItem(category, item))}
+            </ul>
+          </section>
+        )}
         {menuCategories.map((cat) => {
           const status = groupStatus.get(cat.name)!;
           return (
-          <section key={cat.name}>
+          <section key={cat.name} id={slugify(cat.name)} className="scroll-mt-24">
             <div className="border-b border-foreground pb-3 mb-8">
               <h2 className="font-display-black uppercase text-2xl sm:text-3xl tracking-tight leading-none">
                 {cat.name}
@@ -273,96 +456,8 @@ const Index = () => {
               )}
             </div>
 
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-              {cat.items.map((item) => {
-                const key = keyOf(cat.name, item);
-                const qty = cart[key] ?? 0;
-                const unit = parsePrice(item.price);
-                return (
-                  <li key={key} className="flex flex-col">
-                    <div className="relative aspect-[4/3] bg-secondary/40 overflow-hidden flex items-center justify-center">
-                      {item.image ? (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="font-display-black uppercase text-xs text-muted-foreground">
-                          Peremoga
-                        </span>
-                      )}
-                      <div className="absolute top-2 left-2 flex flex-col items-start gap-1">
-                        {item.badge && (
-                          <span
-                            className={`font-body uppercase tracking-[0.2em] text-[9px] px-2 py-1 ${
-                              item.badge === "NEW"
-                                ? "bg-destructive text-destructive-foreground"
-                                : "bg-primary text-primary-foreground"
-                            }`}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                        {item.freezable && (
-                          <span className="flex items-center gap-1 bg-background/90 text-foreground font-body uppercase tracking-[0.2em] text-[9px] px-2 py-1">
-                            <Snowflake className="h-3 w-3" />
-                            Можна заморожувати
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-3 flex items-start justify-between gap-3">
-                      <h3 className="font-display-black uppercase text-sm leading-tight">
-                        {item.name}
-                      </h3>
-                      <span className="font-mono text-sm whitespace-nowrap">{item.price}</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed font-light">
-                      {item.description}
-                    </p>
-                    <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
-                      {item.weight}
-                      {item.minOrder ? ` · мін. ${item.minOrder} шт.` : ""}
-                    </p>
-                    {item.storage && (
-                      <p className="font-body text-[10px] text-muted-foreground/80 mt-1">
-                        {item.storage}
-                      </p>
-                    )}
-
-                    <div className="mt-auto pt-4 flex items-center justify-between gap-3">
-                      <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
-                        {qty > 0 ? `${qty} × ${unit} ₴ = ${qty * unit} ₴` : ""}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => dec(key)}
-                          disabled={qty === 0}
-                          aria-label={`Зменшити ${item.name}`}
-                          className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="font-mono text-sm w-8 text-center tabular-nums">
-                          {qty}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => inc(key)}
-                          aria-label={`Збільшити ${item.name}`}
-                          className="w-8 h-8 border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 sm:gap-y-10">
+              {cat.items.map((item) => renderItem(cat.name, item))}
             </ul>
           </section>
           );
