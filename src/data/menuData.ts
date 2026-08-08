@@ -38,6 +38,8 @@ export interface MenuItem {
   freezable?: boolean;
   /** Overrides the category minimum order quantity */
   minOrder?: number;
+  /** Promo label, e.g. "-15%" or "Акція тижня". Item appears in the Акції section. */
+  promo?: string;
 }
 
 export interface MenuCategory {
