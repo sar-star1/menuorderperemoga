@@ -59,7 +59,24 @@ const Index = () => {
   const [cart, setCart] = useState<CartMap>({});
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const promoItems = useMemo(
+    () =>
+      menuCategories.flatMap((cat) =>
+        cat.items.filter((i) => i.promo).map((item) => ({ category: cat.name, item })),
+      ),
+    [],
+  );
+
+  const scrollToCategory = (id: string) => {
+    setNavOpen(false);
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
   const [form, setForm] = useState({
     customer_name: "",
     phone: "",
