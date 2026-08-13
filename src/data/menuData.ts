@@ -27,6 +27,8 @@ import breadYeastFreeImg from "@/assets/menu/bread-yeast-free.jpg.asset.json";
 export interface MenuItem {
   name: string;
   price: string;
+  /** Original price shown crossed-out for promotions */
+  originalPrice?: string;
   description: string;
   weight: string;
   image?: string;
@@ -119,6 +121,7 @@ export const menuCategories: MenuCategory[] = [
       {
         name: "Наполеон чорничний",
         price: "1 250 ₴",
+        originalPrice: "1 500 ₴",
         promo: "Товар тижня · -15%",
         description:
           "Наполеон з чорничним кремом на основі заварного крему з вершками та чорницею, декорований лохиною.",
