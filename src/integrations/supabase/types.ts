@@ -41,6 +41,30 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_overrides: {
+        Row: {
+          item_key: string
+          original_price: string | null
+          price: string | null
+          promo: string | null
+          updated_at: string
+        }
+        Insert: {
+          item_key: string
+          original_price?: string | null
+          price?: string | null
+          promo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          item_key?: string
+          original_price?: string | null
+          price?: string | null
+          promo?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           address: string
@@ -77,6 +101,30 @@ export type Database = {
           notes?: string | null
           phone?: string
           total_uah?: number
+        }
+        Relationships: []
+      }
+      promo_settings: {
+        Row: {
+          active: boolean
+          id: boolean
+          subtitle: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          id?: boolean
+          subtitle?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          id?: boolean
+          subtitle?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
