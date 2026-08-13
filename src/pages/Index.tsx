@@ -296,7 +296,9 @@ const Index = () => {
             <h3 className="font-display-black uppercase text-sm leading-tight">{item.name}</h3>
             <span className="font-mono text-sm whitespace-nowrap">
               {item.originalPrice && (
-                <span className="line-through text-muted-foreground mr-2">{item.originalPrice}</span>
+                <span className="line-through text-destructive font-medium bg-destructive/10 px-1.5 py-0.5 rounded mr-2 inline-block">
+                  {item.originalPrice}
+                </span>
               )}
               {item.price}
             </span>
