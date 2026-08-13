@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { Minus, Plus, ShoppingCart, X, Snowflake, Info, Tag } from "lucide-react";
-import { menuCategories, deliveryTerms, promoSection, type MenuItem } from "@/data/menuData";
+import { deliveryTerms, type MenuItem } from "@/data/menuData";
+import { useMenuData } from "@/hooks/useMenuData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -64,8 +65,8 @@ const Index = () => {
 
   const promoItems = useMemo(
     () =>
-      promoSection.active
-        ? menuCategories.flatMap((cat) =>
+      promo.active
+        ? categories.flatMap((cat) =>
             cat.items.filter((i) => i.promo).map((item) => ({ category: cat.name, item })),
           )
         : [],
@@ -90,7 +91,7 @@ const Index = () => {
 
   const itemByKey = useMemo(() => {
     const map = new Map<string, { item: MenuItem; category: string; min: number }>();
-    for (const cat of menuCategories) {
+    for (const cat of categories) {
       for (const item of cat.items) {
         map.set(keyOf(cat.name, item), {
           item,
@@ -148,7 +149,7 @@ const Index = () => {
   // that carry their own individual minimum) must reach the category minimum.
   const groupStatus = useMemo(() => {
     const map = new Map<string, { qty: number; min: number; ok: boolean }>();
-    for (const cat of menuCategories) {
+    for (const cat of categories) {
       let qty = 0;
       for (const item of cat.items) {
         if (item.minOrder) continue;
@@ -375,16 +376,16 @@ const Index = () => {
                 <SheetTitle className="font-display-black uppercase text-lg">Категорії</SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col">
-                {promoSection.active && (
+                {promo.active && (
                   <button
                     type="button"
                     onClick={() => scrollToCategory("cat-akcii")}
                     className="text-left border-b border-border py-3 font-display-black uppercase text-sm hover:text-primary transition-colors"
                   >
-                    Акції · {promoSection.title}
+                    Акції · {promo.title}
                   </button>
                 )}
-                {menuCategories.map((cat) => (
+                {categories.map((cat) => (
                   <button
                     key={cat.name}
                     type="button"
@@ -398,7 +399,7 @@ const Index = () => {
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2">
-            {promoSection.active && (
+            {promo.active && (
               <button
                 type="button"
                 onClick={() => scrollToCategory("cat-akcii")}
@@ -406,7 +407,7 @@ const Index = () => {
               >
                 <Tag className="h-4 w-4" />
                 <span className="font-body uppercase tracking-[0.2em] text-[11px]">
-                  {promoSection.title}
+                  {promo.title}
                 </span>
               </button>
             )}
@@ -434,7 +435,7 @@ const Index = () => {
         </div>
       </header>
 
-      {promoSection.active && (
+      {promo.active && (
         <button
           type="button"
           onClick={() => scrollToCategory("cat-akcii")}
@@ -442,22 +443,22 @@ const Index = () => {
         >
           <Tag className="h-4 w-4" />
           <span className="font-body uppercase tracking-[0.25em] text-[10px]">
-            {promoSection.title} · Акції
+            {promo.title} · Акції
           </span>
         </button>
       )}
 
       {/* Menu */}
       <main className="container mx-auto px-6 pt-10 space-y-16">
-        {promoSection.active && (
+        {promo.active && (
           <section id="cat-akcii" className="scroll-mt-24">
             <div className="border-b border-foreground pb-3 mb-8">
               <h2 className="font-display-black uppercase text-2xl sm:text-3xl tracking-tight leading-none flex items-center gap-2">
                 <Tag className="h-5 w-5" />
-                Акції · {promoSection.title}
+                Акції · {promo.title}
               </h2>
               <p className="font-body text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-2">
-                {promoSection.subtitle}
+                {promo.subtitle}
               </p>
             </div>
             {promoItems.length > 0 ? (
@@ -471,7 +472,7 @@ const Index = () => {
             )}
           </section>
         )}
-        {menuCategories.map((cat) => {
+        {categories.map((cat) => {
           const status = groupStatus.get(cat.name)!;
           return (
           <section key={cat.name} id={slugify(cat.name)} className="scroll-mt-24">
