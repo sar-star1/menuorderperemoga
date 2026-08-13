@@ -35,6 +35,7 @@ Deno.serve(async (req) => {
           price: o.price ? String(o.price).slice(0, 40) : null,
           original_price: o.original_price ? String(o.original_price).slice(0, 40) : null,
           promo: o.promo ? String(o.promo).slice(0, 80) : null,
+          image_url: o.image_url ? String(o.image_url).slice(0, 900000) : null,
           updated_at: new Date().toISOString(),
         }));
 

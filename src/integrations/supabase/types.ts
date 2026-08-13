@@ -43,6 +43,7 @@ export type Database = {
       }
       menu_overrides: {
         Row: {
+          image_url: string | null
           item_key: string
           original_price: string | null
           price: string | null
@@ -50,6 +51,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          image_url?: string | null
           item_key: string
           original_price?: string | null
           price?: string | null
@@ -57,6 +59,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          image_url?: string | null
           item_key?: string
           original_price?: string | null
           price?: string | null

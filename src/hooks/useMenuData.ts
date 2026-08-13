@@ -7,6 +7,7 @@ export type MenuOverride = {
   price: string | null;
   original_price: string | null;
   promo: string | null;
+  image_url?: string | null;
 };
 
 export const menuKeyOf = (category: string, itemName: string) => `${category}::${itemName}`;
@@ -54,6 +55,7 @@ export const useMenuData = () => {
             price: o.price || item.price,
             originalPrice: o.original_price || undefined,
             promo: o.promo || undefined,
+            image: o.image_url || item.image,
           };
         }),
       })),
