@@ -57,6 +57,7 @@ const checkoutSchema = z.object({
 });
 
 const Index = () => {
+  const { categories, promo } = useMenuData();
   const [cart, setCart] = useState<CartMap>({});
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
