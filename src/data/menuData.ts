@@ -123,7 +123,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Наполеон з чорничним кремом на основі заварного крему з вершками та чорницею, декорований лохиною.",
         weight: "1,7 кг",
-        badge: "NEW",
+        badge: "\n",
         storage: "Термін придатності: 4 доби.",
         image: B + "ehLxZ-cvlUC-IVXAg.png",
       },
@@ -132,7 +132,7 @@ export const menuCategories: MenuCategory[] = [
         price: "1 050 ₴",
         description: "Пісочна основа, фісташкова начинка та свіжа малина.",
         weight: "1,33 кг",
-        badge: "NEW",
+        badge: "\n",
         storage: "Термін придатності: 3 доби.",
         image: B + "wIFnc-IBaHI-GDIPW.jpeg",
       },
@@ -142,7 +142,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Пісочна основа, мʼятний крем на основі білого шоколаду, крем з чорницею та вершками, декорований лохиною.",
         weight: "1,13 кг",
-        badge: "NEW",
+        badge: "\n",
         storage: "Термін придатності: 3 доби.",
         image: B + "IiOSq-GyIqb-uODEG.png",
       },
@@ -152,7 +152,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Вершкові бісквіти, крем манго, конфі маракуя зі шматочками манго, декорований вершками і кюлі маракуя.",
         weight: "1,68 кг",
-        badge: "NEW",
+        badge: "\n",
         storage: "Термін придатності: 4 доби.",
         image: B + "CVHbG-JGuFl-zdKbK.png",
       },
@@ -193,7 +193,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Круглий круасан з листкового тіста. Начинка: крем зі смаком манго-маракуя. Прикрашений кольоровою глазурʼю, сушеним манго і шоколадною крихтою.",
         weight: "180 г",
-        badge: "NEW",
+        badge: "\n",
         image: B + "Ctoeb-WoFQg-xSfym.png",
       },
       {
@@ -350,7 +350,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Заварне тісто. Начинка: чорничний крем на основі білого шоколаду та вершків, лимонний курд. Прикрашений лохиною і ніжним кремом.",
         weight: "100 г",
-        badge: "NEW",
+        badge: "\n",
         freezable: true,
         image: B + "KsAFb-qevzu-oFHRF.png",
       },
@@ -520,7 +520,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Пісочне тісто з мигдалевим борошном, фісташковий крем та свіжа малина.",
         weight: "1,4 кг",
-        badge: "NEW",
+        badge: "\n",
         storage: "Термін придатності: 3 доби.",
         image: B + "wIFnc-IBaHI-GDIPW.jpeg",
       },
@@ -855,7 +855,7 @@ export const menuCategories: MenuCategory[] = [
         description:
           "Шоколадне ніжно-повітряне тісто з кремовою начинкою з лісового горіха.",
         weight: "70 г",
-        badge: "NEW",
+        badge: "\n",
         freezable: true,
         image: donutHazelnutImg.url,
       },
