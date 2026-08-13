@@ -8,7 +8,30 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 
-type Draft = { price: string; original_price: string; promo: string };
+type Draft = { price: string; original_price: string; promo: string; image_url: string };
+
+/** Downscale + compress an uploaded photo so it can be stored inline. */
+const fileToCompressedDataUrl = (file: File, max = 800): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("no ctx"));
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.72));
+      };
+      img.onerror = reject;
+      img.src = String(reader.result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
 const AdminMenuEditor = ({ password }: { password: string }) => {
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
@@ -27,6 +50,7 @@ const AdminMenuEditor = ({ password }: { password: string }) => {
           price: o?.price || item.price,
           original_price: o?.original_price ?? (o ? "" : item.originalPrice ?? ""),
           promo: o?.promo ?? (o ? "" : item.promo ?? ""),
+          image_url: o?.image_url ?? "",
         };
       }
     }
@@ -42,6 +66,7 @@ const AdminMenuEditor = ({ password }: { password: string }) => {
         price: d.price.trim(),
         original_price: d.original_price.trim(),
         promo: d.promo.trim(),
+        image_url: d.image_url.trim(),
       }));
     }
     const { data, error } = await supabase.functions.invoke("menu-admin", { body: payload });
@@ -76,6 +101,17 @@ const AdminMenuEditor = ({ password }: { password: string }) => {
     const ok = await load("save");
     setSaving(false);
     if (ok) toast({ title: "Збережено", description: "Меню оновлено на сайті." });
+  };
+
+  const onPickImage = async (key: string, file?: File | null) => {
+    if (!file) return;
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      set(key, "image_url", dataUrl);
+      toast({ title: "Фото додано", description: "Не забудьте зберегти зміни." });
+    } catch {
+      toast({ title: "Не вдалося обробити фото", variant: "destructive" });
+    }
   };
 
   const set = (key: string, field: keyof Draft, value: string) =>
@@ -130,7 +166,9 @@ const AdminMenuEditor = ({ password }: { password: string }) => {
           <ul className="space-y-3">
             {cat.items.map((item) => {
               const key = menuKeyOf(cat.name, item.name);
-              const d = drafts[key] ?? { price: item.price, original_price: "", promo: "" };
+              const d =
+                drafts[key] ?? { price: item.price, original_price: "", promo: "", image_url: "" };
+              const preview = d.image_url || item.image;
               return (
                 <li key={key} className="grid gap-2 sm:grid-cols-[1.4fr_0.7fr_0.7fr_1fr] sm:items-center">
                   <span className="text-xs">{item.name}</span>
@@ -155,6 +193,34 @@ const AdminMenuEditor = ({ password }: { password: string }) => {
                     onChange={(e) => set(key, "promo", e.target.value)}
                     className="h-9 text-xs"
                   />
+                  <div className="flex items-center gap-2 sm:col-span-4">
+                    {preview ? (
+                      <img
+                        src={preview}
+                        alt={`Фото ${item.name}`}
+                        className="h-12 w-12 object-cover border border-border"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 border border-dashed border-border" />
+                    )}
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      aria-label={`Фото ${item.name}`}
+                      onChange={(e) => onPickImage(key, e.target.files?.[0])}
+                      className="h-9 text-xs max-w-xs"
+                    />
+                    {d.image_url && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => set(key, "image_url", "")}
+                      >
+                        Скинути фото
+                      </Button>
+                    )}
+                  </div>
                 </li>
               );
             })}
