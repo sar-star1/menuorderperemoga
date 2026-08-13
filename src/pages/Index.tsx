@@ -71,7 +71,7 @@ const Index = () => {
             cat.items.filter((i) => i.promo).map((item) => ({ category: cat.name, item })),
           )
         : [],
-    [],
+    [categories, promo],
   );
 
   const scrollToCategory = (id: string) => {
@@ -102,7 +102,7 @@ const Index = () => {
       }
     }
     return map;
-  }, []);
+  }, [categories]);
 
   const setQty = (key: string, qty: number) => {
     setCart((prev) => {
@@ -159,7 +159,7 @@ const Index = () => {
       map.set(cat.name, { qty, min: cat.minOrder, ok: qty === 0 || qty >= cat.minOrder });
     }
     return map;
-  }, [cart]);
+  }, [cart, categories]);
 
   const itemMinIssues = useMemo(
     () =>
