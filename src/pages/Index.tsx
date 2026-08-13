@@ -292,7 +292,12 @@ const Index = () => {
         <div className="order-1 sm:order-none flex-1 min-w-0 flex flex-col">
           <div className="sm:mt-3 flex items-start justify-between gap-3">
             <h3 className="font-display-black uppercase text-sm leading-tight">{item.name}</h3>
-            <span className="font-mono text-sm whitespace-nowrap">{item.price}</span>
+            <span className="font-mono text-sm whitespace-nowrap">
+              {item.originalPrice && (
+                <span className="line-through text-muted-foreground mr-2">{item.originalPrice}</span>
+              )}
+              {item.price}
+            </span>
           </div>
           <p className="text-[11px] text-muted-foreground mt-1 sm:mt-2 leading-relaxed font-light line-clamp-2 sm:line-clamp-none">
             {item.description}
