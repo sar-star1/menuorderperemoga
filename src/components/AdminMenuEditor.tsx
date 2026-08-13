@@ -124,9 +124,11 @@ const AdminMenuEditor = ({ password }: { password: string }) => {
       <div className="border border-border p-4 space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="font-display-black uppercase text-sm">Рубрика «Товар тижня»</p>
+            <p className="font-display-black uppercase text-sm">
+              Рубрика «{settings.title || "Акції"}»
+            </p>
             <p className="text-xs text-muted-foreground">
-              Вмикає кнопку і секцію «Акції» на сайті.
+              Вмикає кнопку і секцію «Акції» на сайті. Назву можна змінити нижче.
             </p>
           </div>
           <Switch
