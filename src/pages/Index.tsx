@@ -272,7 +272,7 @@ const Index = () => {
             {item.badge && (
               <span
                 className={`font-body uppercase tracking-[0.2em] text-[8px] sm:text-[9px] px-1.5 py-0.5 sm:px-2 sm:py-1 ${
-                  item.badge === "NEW"
+                  item.badge === "NEW" || item.badge === "\n"
                     ? "bg-destructive text-destructive-foreground"
                     : "bg-primary text-primary-foreground"
                 }`}

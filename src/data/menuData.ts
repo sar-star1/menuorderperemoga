@@ -33,7 +33,7 @@ export interface MenuItem {
   ingredients?: string;
   storage?: string;
   /** Highlight badge shown on the card */
-  badge?: "NEW" | "ОНОВЛЕННЯ ДЕКОРУ";
+  badge?: string;
   /** Product can be frozen */
   freezable?: boolean;
   /** Overrides the category minimum order quantity */
