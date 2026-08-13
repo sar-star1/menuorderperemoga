@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import AdminMenuEditor from "@/components/AdminMenuEditor";
 import logo from "@/assets/peremoga-logo.jpg.asset.json";
 
 type OrderItem = {
@@ -32,6 +33,7 @@ const Admin = () => {
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"orders" | "menu">("orders");
 
   const load = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -107,6 +109,16 @@ const Admin = () => {
               {loading ? "Завантаження…" : "Увійти"}
             </Button>
           </form>
+        ) : tab === "menu" ? (
+          <div className="space-y-6">
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setTab("orders")}>
+                Замовлення
+              </Button>
+              <Button size="sm">Меню та акції</Button>
+            </div>
+            <AdminMenuEditor password={password} />
+          </div>
         ) : (
           (() => {
             const pending = orders.filter((o) => !o.completed_at);
@@ -114,6 +126,12 @@ const Admin = () => {
             const visible = showCompleted ? completed : pending;
             return (
               <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Button size="sm">Замовлення</Button>
+                  <Button variant="outline" size="sm" onClick={() => setTab("menu")}>
+                    Меню та акції
+                  </Button>
+                </div>
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div className="flex gap-2">
                     <Button
